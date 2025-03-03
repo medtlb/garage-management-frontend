@@ -66,14 +66,27 @@ export class AuthService {
 
   private getUserFromToken(token: string): User | null {
     try {
+      // Basic JWT decode (payload is in the second part of the token)
       const payload = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payload));
       
+      // Debug what's in the token
+      console.log('Decoded token payload:', decodedPayload);
+      
+      // Your API might be returning the role in a different format
+      // It could be in decodedPayload.role, decodedPayload.authorities, etc.
+      // Let's check common patterns:
+      const role = decodedPayload.role || 
+                  (decodedPayload.authorities && decodedPayload.authorities[0]) ||
+                  (decodedPayload.roles && decodedPayload.roles[0]);
+      
+      console.log('Extracted role:', role);
+      
       return {
-        id: decodedPayload.id,
-        email: decodedPayload.sub,
-        nom: decodedPayload.nom || '',
-        role: decodedPayload.authorities ? decodedPayload.authorities[0] : ''
+        id: decodedPayload.id || decodedPayload.sub,
+        email: decodedPayload.sub || decodedPayload.email,
+        nom: decodedPayload.nom || decodedPayload.name || '',
+        role: role || 'UNKNOWN'
       };
     } catch (error) {
       console.error('Error decoding token', error);

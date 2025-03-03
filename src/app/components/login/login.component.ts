@@ -19,10 +19,16 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
+    // Initialize form
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+    
+    // Redirect if already logged in
+    if (this.authService.currentUserValue) {
+      this.redirectBasedOnRole();
+    }
   }
 
   get f() { 
@@ -30,6 +36,7 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    // Stop if form is invalid
     if (this.loginForm.invalid) {
       return;
     }
@@ -40,19 +47,27 @@ export class LoginComponent {
     this.authService.login(this.f['email'].value, this.f['password'].value)
       .subscribe({
         next: () => {
-          const user = this.authService.currentUserValue;
-          if (user?.role === 'ADMIN') {
-            alert('Welcome Admin');
-          } else if (user?.role === 'CLIENT') {
-            alert('Welcome Client');
-          } else {
-            alert('Welcome User');
-          }
+          this.redirectBasedOnRole();
         },
         error: error => {
           this.error = error.error || 'Login failed. Please check your credentials.';
           this.loading = false;
         }
       });
+  }
+
+  private redirectBasedOnRole() {
+    const user = this.authService.currentUserValue;
+    console.log('Current user:', user);
+    
+    if (user?.role === 'CLIENT') {
+      this.router.navigate(['/map']);
+    } else if (user?.role === 'ADMIN') {
+      alert('Welcome Admin! Admin dashboard is not implemented yet.');
+    } else {
+      // Log details for debugging
+      console.log('User role not recognized:', user?.role);
+      alert(`Login successful but your role (${user?.role}) does not have access.`);
+    }
   }
 }

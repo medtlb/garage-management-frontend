@@ -1,4 +1,3 @@
-// src/app/components/map/map.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
@@ -36,7 +35,12 @@ export class MapComponent implements OnInit {
   
   // Garage-related properties
   garages: Garage[] = [];
+  filteredGarages: Garage[] = [];
   selectedGarage: Garage | null = null;
+  
+  // Filtering
+  selectedCategory: string = '';
+  searchTerm: string = '';
   
   // Component state
   loading = true;
@@ -89,8 +93,6 @@ export class MapComponent implements OnInit {
 
     this.garageService.getAllGarages().subscribe({
       next: (data) => {
-        console.log('Garages received:', data);
-        
         this.garages = data.filter(garage => 
           garage.latitude != null && 
           garage.longitude != null && 
@@ -98,6 +100,7 @@ export class MapComponent implements OnInit {
           !isNaN(garage.longitude)
         );
         
+        this.filteredGarages = [...this.garages];
         this.loading = false;
         
         // Create markers for each valid garage
@@ -122,7 +125,7 @@ export class MapComponent implements OnInit {
   }
 
   createGarageMarkers(): void {
-    this.garageMarkers = this.garages.map(garage => {
+    this.garageMarkers = this.filteredGarages.map(garage => {
       return {
         position: {
           lat: garage.latitude,
@@ -132,8 +135,8 @@ export class MapComponent implements OnInit {
         options: {
           icon: {
             url: 'assets/garage-marker.svg',
-            scaledSize: new google.maps.Size(40, 40), // Adjust size as needed
-            anchor: new google.maps.Point(20, 40)     // Center the icon
+            scaledSize: new google.maps.Size(40, 40),
+            anchor: new google.maps.Point(20, 40)
           },
           animation: google.maps.Animation.DROP
         },
@@ -142,18 +145,15 @@ export class MapComponent implements OnInit {
     });
   }
   
-  // Modify the click handler to use the new marker interaction
-  selectGarage(garage: Garage | null): void {
-    if (garage) {
-      this.selectedGarage = garage;
-      
-      // Center map on selected garage
-      this.center = {
-        lat: garage.latitude,
-        lng: garage.longitude
-      };
-      this.zoom = 15;
-    }
+  selectGarage(garage: Garage): void {
+    this.selectedGarage = garage;
+    
+    // Center map on selected garage
+    this.center = {
+      lat: garage.latitude,
+      lng: garage.longitude
+    };
+    this.zoom = 15;
   }
 
   closeGarageDetails(): void {
@@ -164,8 +164,6 @@ export class MapComponent implements OnInit {
     if (this.selectedGarage) {
       // TODO: Implement full reservation logic
       alert(`Reservation for ${this.selectedGarage.nom} is coming soon!`);
-      // You might want to navigate to a reservation page or open a modal
-      // this.router.navigate(['/reservation', this.selectedGarage.id]);
     }
   }
 
@@ -196,6 +194,48 @@ export class MapComponent implements OnInit {
         }
       );
     }
+  }
+
+  getCategoryLabel(category: string | undefined): string {
+    const categoryLabels: Record<string, string> = {
+      'VEHICULES_LEGERS': 'Véhicules légers',
+      'VEHICULES_UTILITAIRES': 'Véhicules utilitaires',
+      'CAMIONS': 'Camions',
+      'VEHICULES_ELECTRIQUES_HYBRIDES': 'Véhicules électriques et hybrides',
+      'MOTOS_SCOOTERS': 'Motos et scooters',
+      'ENGINS_AGRICOLES': 'Engins agricoles',
+      'VEHICULES_CHANTIER': 'Véhicules de chantier'
+    };
+  
+    // Handle undefined or unknown categories
+    return category && categoryLabels[category] 
+      ? categoryLabels[category] 
+      : (category || 'Non spécifié');
+  }
+
+  filterByCategory(event: any): void {
+    this.selectedCategory = event.target.value;
+    this.applyFilters();
+  }
+
+  filterGarages(event: any): void {
+    this.searchTerm = event.target.value.toLowerCase();
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    this.filteredGarages = this.garages.filter(garage => {
+      const matchesCategory = !this.selectedCategory || 
+        garage.categorie === this.selectedCategory;
+      
+      const matchesSearch = !this.searchTerm || 
+        garage.nom.toLowerCase().includes(this.searchTerm);
+      
+      return matchesCategory && matchesSearch;
+    });
+
+    // Recreate markers for filtered garages
+    this.createGarageMarkers();
   }
 
   logout(): void {

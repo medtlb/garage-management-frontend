@@ -10,36 +10,51 @@
         </div>
       </div>
     </div>
-  
+    
     <div class="map-content">
       <div class="sidebar">
+        <!-- Category Filter -->
+        <div class="category-filter">
+          <select (change)="filterByCategory($event)">
+            <option value="">All Categories</option>
+            <option value="VEHICULES_LEGERS">Véhicules légers</option>
+            <option value="VEHICULES_UTILITAIRES">Véhicules utilitaires</option>
+            <option value="CAMIONS">Camions</option>
+            <option value="VEHICULES_ELECTRIQUES_HYBRIDES">Véhicules électriques et hybrides</option>
+            <option value="MOTOS_SCOOTERS">Motos et scooters</option>
+            <option value="ENGINS_AGRICOLES">Engins agricoles</option>
+            <option value="VEHICULES_CHANTIER">Véhicules de chantier</option>
+          </select>
+        </div>
+  
         <div class="search-bar">
           <input 
             type="text" 
             placeholder="Search garages..." 
             class="search-input"
+            (input)="filterGarages($event)"
           >
           <button class="search-btn">
             <i class="search-icon">🔍</i>
           </button>
         </div>
-  
+    
         <div class="garage-list">
           <div *ngIf="loading" class="loading-state">
             <div class="spinner"></div>
             <p>Loading garages...</p>
           </div>
-  
+    
           <div *ngIf="error" class="error-state">
             {{ error }}
           </div>
-  
-          <div *ngIf="!loading && garages.length === 0" class="empty-state">
+    
+          <div *ngIf="!loading && filteredGarages.length === 0" class="empty-state">
             <p>No garages found in your area.</p>
           </div>
-  
+    
           <div 
-            *ngFor="let garage of garages" 
+            *ngFor="let garage of filteredGarages" 
             class="garage-card"
             [class.active]="selectedGarage?.id === garage.id"
             (click)="selectGarage(garage)"
@@ -50,15 +65,15 @@
                 <span class="garage-phone">
                   <i>📞</i> {{ garage.telephone || 'No phone' }}
                 </span>
-                <span class="garage-capacity">
-                  <i>🚗</i> Capacity: {{ garage.capacite || 'N/A' }}
+                <span class="garage-category">
+                  <i>🚗</i> {{ getCategoryLabel(garage.categorie) }}
                 </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-  
+    
       <div class="map-wrapper">
         <google-map 
           *ngIf="apiLoaded"
@@ -74,9 +89,9 @@
             [position]="marker.position"
             [title]="marker.title"
             [options]="marker.options"
-            (click)="selectGarage(marker.garage)"
-          ></map-marker>
-  
+            (mapClick)="marker.onClick()"
+        ></map-marker>
+    
           <!-- User location marker -->
           <map-marker
             *ngIf="userMarker"
@@ -86,7 +101,7 @@
           ></map-marker>
         </google-map>
       </div>
-  
+    
       <!-- Garage Details Modal -->
       <div *ngIf="selectedGarage" class="garage-details-modal">
         <div class="modal-content">
@@ -106,6 +121,10 @@
             <div class="detail-row">
               <span class="detail-label">Capacity:</span>
               <span class="detail-value">{{ selectedGarage.capacite || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Category:</span>
+              <span class="detail-value">{{ getCategoryLabel(selectedGarage.categorie) }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Location:</span>

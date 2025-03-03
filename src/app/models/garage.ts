@@ -1,4 +1,3 @@
-// src/app/models/garage.ts
 export interface Garage {
     id: number;
     nom: string;
@@ -7,4 +6,11 @@ export interface Garage {
     telephone?: string;
     email?: string;
     capacite?: number;
-  }
+    categorie?: 'VEHICULES_LEGERS' | 
+                'VEHICULES_UTILITAIRES' | 
+                'CAMIONS' | 
+                'VEHICULES_ELECTRIQUES_HYBRIDES' | 
+                'MOTOS_SCOOTERS' | 
+                'ENGINS_AGRICOLES' | 
+                'VEHICULES_CHANTIER';
+}

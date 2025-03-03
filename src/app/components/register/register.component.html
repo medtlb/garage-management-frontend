@@ -1,0 +1,65 @@
+<!-- src/app/components/register/register.component.html -->
+<div class="register-container">
+    <div class="register-card">
+      <h2>Register</h2>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="nom">Full Name</label>
+          <input 
+            type="text" 
+            id="nom" 
+            formControlName="nom" 
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['nom'].touched && f['nom'].errors }"
+          />
+          <div *ngIf="f['nom'].touched && f['nom'].errors" class="invalid-feedback">
+            <div *ngIf="f['nom'].errors['required']">Name is required</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['email'].touched && f['email'].errors }"
+          />
+          <div *ngIf="f['email'].touched && f['email'].errors" class="invalid-feedback">
+            <div *ngIf="f['email'].errors['required']">Email is required</div>
+            <div *ngIf="f['email'].errors['email']">Please enter a valid email</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            class="form-control"
+            [ngClass]="{ 'is-invalid': f['password'].touched && f['password'].errors }"
+          />
+          <div *ngIf="f['password'].touched && f['password'].errors" class="invalid-feedback">
+            <div *ngIf="f['password'].errors['required']">Password is required</div>
+            <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+          </div>
+        </div>
+  
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+        <div *ngIf="success" class="alert alert-success">{{success}}</div>
+  
+        <div class="form-group">
+          <button [disabled]="loading || registerForm.invalid" class="btn btn-primary">
+            <span *ngIf="loading" class="spinner"></span>
+            Register
+          </button>
+        </div>
+  
+        <div class="login-link">
+          Already have an account? <a routerLink="/login">Login</a>
+        </div>
+      </form>
+    </div>
+  </div>

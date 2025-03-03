@@ -78,12 +78,23 @@ export class MapComponent implements OnInit {
   }
 
   loadGarages(): void {
+    this.loading = true;
+    this.error = '';
+  
     this.garageService.getAllGarages().subscribe({
       next: (data) => {
-        this.garages = data;
+        console.log('Garages received:', data);
+        
+        this.garages = data.filter(garage => 
+          garage.latitude != null && 
+          garage.longitude != null && 
+          !isNaN(garage.latitude) && 
+          !isNaN(garage.longitude)
+        );
+        
         this.loading = false;
         
-        // Create markers for each garage
+        // Create markers for each valid garage
         this.createGarageMarkers();
         
         // If garages are found, center the map on the first garage
@@ -92,12 +103,14 @@ export class MapComponent implements OnInit {
             lat: this.garages[0].latitude,
             lng: this.garages[0].longitude
           };
+        } else {
+          this.error = 'No garages found.';
         }
       },
       error: (err) => {
-        this.error = 'Failed to load garages. Please try again later.';
+        console.error('Detailed garage loading error:', err);
+        this.error = err.message || 'Failed to load garages. Please try again later.';
         this.loading = false;
-        console.error('Error loading garages:', err);
       }
     });
   }

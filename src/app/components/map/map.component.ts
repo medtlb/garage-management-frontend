@@ -33,13 +33,16 @@ export class MapComponent implements OnInit {
   // Markers
   garageMarkers: any[] = [];
   userMarker?: any;
+  
+  // Garage-related properties
+  garages: Garage[] = [];
   selectedGarage: Garage | null = null;
   
-  // State
-  garages: Garage[] = [];
+  // Component state
   loading = true;
   error = '';
   apiLoaded = false;
+  userName: string = '';
 
   constructor(
     private garageService: GarageService,
@@ -55,6 +58,9 @@ export class MapComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+
+    // Set user name
+    this.userName = user.nom || 'User';
 
     // Load the Google Maps API script
     this.loadGoogleMapsAPI();
@@ -80,7 +86,7 @@ export class MapComponent implements OnInit {
   loadGarages(): void {
     this.loading = true;
     this.error = '';
-  
+
     this.garageService.getAllGarages().subscribe({
       next: (data) => {
         console.log('Garages received:', data);
@@ -122,22 +128,45 @@ export class MapComponent implements OnInit {
           lat: garage.latitude,
           lng: garage.longitude
         },
-        label: {
-          color: 'white',
-          text: garage.nom
-        },
         title: garage.nom,
         options: {
-          animation: google.maps.Animation.DROP,
+          icon: {
+            url: 'assets/garage-marker.svg',
+            scaledSize: new google.maps.Size(40, 40), // Adjust size as needed
+            anchor: new google.maps.Point(20, 40)     // Center the icon
+          },
+          animation: google.maps.Animation.DROP
         },
         garage: garage
       };
     });
   }
+  
+  // Modify the click handler to use the new marker interaction
+  selectGarage(garage: Garage | null): void {
+    if (garage) {
+      this.selectedGarage = garage;
+      
+      // Center map on selected garage
+      this.center = {
+        lat: garage.latitude,
+        lng: garage.longitude
+      };
+      this.zoom = 15;
+    }
+  }
 
-  openInfoWindow(marker: MapMarker, garage: Garage): void {
-    this.selectedGarage = garage;
-    this.info.open(marker);
+  closeGarageDetails(): void {
+    this.selectedGarage = null;
+  }
+
+  makeReservation(): void {
+    if (this.selectedGarage) {
+      // TODO: Implement full reservation logic
+      alert(`Reservation for ${this.selectedGarage.nom} is coming soon!`);
+      // You might want to navigate to a reservation page or open a modal
+      // this.router.navigate(['/reservation', this.selectedGarage.id]);
+    }
   }
 
   getCurrentLocation(): void {

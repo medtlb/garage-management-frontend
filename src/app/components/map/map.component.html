@@ -1,56 +1,124 @@
-<!-- src/app/components/map/map.component.html -->
 <div class="map-container">
     <div class="map-header">
-      <h1>Nearby Garages</h1>
-      <button class="btn-logout" (click)="logout()">Logout</button>
-    </div>
-    
-    <div *ngIf="loading" class="loading-indicator">
-      <div class="spinner"></div>
-      <p>Loading garages...</p>
-    </div>
-    
-    <div *ngIf="error" class="error-message">
-      {{ error }}
+      <div class="header-content">
+        <h1>Garage Finder</h1>
+        <div class="user-section">
+          <span class="user-name">{{ userName }}</span>
+          <button class="logout-btn" (click)="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   
     <div class="map-content">
-      <google-map 
-        *ngIf="apiLoaded"
-        [center]="center" 
-        [zoom]="zoom"
-        [options]="options"
-        height="100%"
-        width="100%"
-      >
-        <!-- Garage markers -->
-        <map-marker
-          *ngFor="let marker of garageMarkers"
-          [position]="marker.position"
-          [label]="marker.label"
-          [title]="marker.title"
-          [options]="marker.options"
-          (mapClick)="openInfoWindow(marker, marker.garage)"
-        ></map-marker>
+      <div class="sidebar">
+        <div class="search-bar">
+          <input 
+            type="text" 
+            placeholder="Search garages..." 
+            class="search-input"
+          >
+          <button class="search-btn">
+            <i class="search-icon">🔍</i>
+          </button>
+        </div>
   
-        <!-- User location marker -->
-        <map-marker
-          *ngIf="userMarker"
-          [position]="userMarker.position"
-          [title]="userMarker.title"
-          [options]="userMarker.options"
-        ></map-marker>
-  
-        <!-- Info window -->
-        <map-info-window>
-          <div *ngIf="selectedGarage" class="garage-info">
-            <h3>{{ selectedGarage.nom }}</h3>
-            <p *ngIf="selectedGarage.telephone"><strong>Phone:</strong> {{ selectedGarage.telephone }}</p>
-            <p *ngIf="selectedGarage.email"><strong>Email:</strong> {{ selectedGarage.email }}</p>
-            <p *ngIf="selectedGarage.capacite"><strong>Capacity:</strong> {{ selectedGarage.capacite }}</p>
-            <button class="btn-reserve">Make Reservation</button>
+        <div class="garage-list">
+          <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading garages...</p>
           </div>
-        </map-info-window>
-      </google-map>
+  
+          <div *ngIf="error" class="error-state">
+            {{ error }}
+          </div>
+  
+          <div *ngIf="!loading && garages.length === 0" class="empty-state">
+            <p>No garages found in your area.</p>
+          </div>
+  
+          <div 
+            *ngFor="let garage of garages" 
+            class="garage-card"
+            [class.active]="selectedGarage?.id === garage.id"
+            (click)="selectGarage(garage)"
+          >
+            <div class="garage-info">
+              <h3>{{ garage.nom }}</h3>
+              <div class="garage-details">
+                <span class="garage-phone">
+                  <i>📞</i> {{ garage.telephone || 'No phone' }}
+                </span>
+                <span class="garage-capacity">
+                  <i>🚗</i> Capacity: {{ garage.capacite || 'N/A' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="map-wrapper">
+        <google-map 
+          *ngIf="apiLoaded"
+          [center]="center" 
+          [zoom]="zoom"
+          [options]="options"
+          height="100%"
+          width="100%"
+        >
+          <!-- Garage markers -->
+          <map-marker
+            *ngFor="let marker of garageMarkers"
+            [position]="marker.position"
+            [title]="marker.title"
+            [options]="marker.options"
+            (click)="selectGarage(marker.garage)"
+          ></map-marker>
+  
+          <!-- User location marker -->
+          <map-marker
+            *ngIf="userMarker"
+            [position]="userMarker.position"
+            [title]="userMarker.title"
+            [options]="userMarker.options"
+          ></map-marker>
+        </google-map>
+      </div>
+  
+      <!-- Garage Details Modal -->
+      <div *ngIf="selectedGarage" class="garage-details-modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>{{ selectedGarage.nom }}</h2>
+            <button class="close-btn" (click)="closeGarageDetails()">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="detail-row">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value">{{ selectedGarage.email || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Phone:</span>
+              <span class="detail-value">{{ selectedGarage.telephone || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Capacity:</span>
+              <span class="detail-value">{{ selectedGarage.capacite || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Location:</span>
+              <span class="detail-value">
+                Lat: {{ selectedGarage.latitude | number:'1.4-4' }}, 
+                Lng: {{ selectedGarage.longitude | number:'1.4-4' }}
+              </span>
+            </div>
+            <button class="reserve-btn" (click)="makeReservation()">
+              Make Reservation
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>

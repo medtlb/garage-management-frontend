@@ -70,23 +70,34 @@ export class AuthService {
       const payload = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payload));
       
-      // Debug what's in the token
-      console.log('Decoded token payload:', decodedPayload);
+      console.log('Full decoded token payload:', decodedPayload);
       
-      // Your API might be returning the role in a different format
-      // It could be in decodedPayload.role, decodedPayload.authorities, etc.
-      // Let's check common patterns:
-      const role = decodedPayload.role || 
-                  (decodedPayload.authorities && decodedPayload.authorities[0]) ||
-                  (decodedPayload.roles && decodedPayload.roles[0]);
+      // Spring Security typically stores roles differently
+      let role = 'UNKNOWN';
+      
+      // Check multiple possible locations for role
+      if (decodedPayload.role) {
+        role = decodedPayload.role;
+      } else if (decodedPayload.authorities) {
+        // Spring Security often uses 'authorities'
+        // Assuming the first authority is the role
+        role = decodedPayload.authorities[0]?.authority || 
+               decodedPayload.authorities[0] || 
+               'UNKNOWN';
+      } else if (decodedPayload.scope) {
+        role = decodedPayload.scope;
+      }
+  
+      // Remove 'ROLE_' prefix if present
+      role = role.replace(/^ROLE_/, '');
       
       console.log('Extracted role:', role);
       
       return {
-        id: decodedPayload.id || decodedPayload.sub,
+        id: decodedPayload.sub || decodedPayload.id,
         email: decodedPayload.sub || decodedPayload.email,
         nom: decodedPayload.nom || decodedPayload.name || '',
-        role: role || 'UNKNOWN'
+        role: role
       };
     } catch (error) {
       console.error('Error decoding token', error);

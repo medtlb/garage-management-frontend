@@ -36,26 +36,22 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    // Stop if form is invalid
-    if (this.loginForm.invalid) {
-      return;
-    }
-
-    this.loading = true;
-    this.error = '';
-
+    // ... existing code ...
     this.authService.login(this.f['email'].value, this.f['password'].value)
       .subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Full login response:', response);
+          const user = this.authService.currentUserValue;
+          console.log('Decoded user:', user);
           this.redirectBasedOnRole();
         },
         error: error => {
+          console.error('Full login error:', error);
           this.error = error.error || 'Login failed. Please check your credentials.';
           this.loading = false;
         }
       });
   }
-
   private redirectBasedOnRole() {
     const user = this.authService.currentUserValue;
     console.log('Current user:', user);

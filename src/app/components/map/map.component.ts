@@ -1,9 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GarageService } from '../../services/garage.service';
 import { AuthService } from '../../services/auth.service';
+import { VoitureService } from '../../services/voiture.service';
 import { Garage } from '../../models/garage';
+import { Vehicle } from '../../models/vehicle';
 
 @Component({
   selector: 'app-map',
@@ -48,11 +51,32 @@ export class MapComponent implements OnInit {
   apiLoaded = false;
   userName: string = '';
 
+  // Tab state
+  activeTab = 'garages';
+
+  // Vehicle properties
+  userVehicles: Vehicle[] = [];
+  loadingVehicles = false;
+  vehicleError = '';
+  showAddVehicleModal = false;
+  vehicleForm: FormGroup;
+  addingVehicle = false;
+  selectedFile: File | null = null;
+
   constructor(
+    private formBuilder: FormBuilder,
     private garageService: GarageService,
     private authService: AuthService,
+    private voitureService: VoitureService,
     private router: Router
-  ) { }
+  ) {
+    // Initialize vehicle form
+    this.vehicleForm = this.formBuilder.group({
+      immatriculation: ['', Validators.required],
+      marque: ['', Validators.required],
+      model: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     // Check if the user is a client
@@ -140,7 +164,9 @@ export class MapComponent implements OnInit {
           },
           animation: google.maps.Animation.DROP
         },
-        garage: garage
+        onClick: () => {
+          this.selectGarage(garage);
+        }
       };
     });
   }
@@ -241,5 +267,126 @@ export class MapComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  // Vehicle tab methods
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+    
+    // Load vehicles when switching to vehicles tab
+    if (tab === 'vehicles' && this.userVehicles.length === 0) {
+      this.loadUserVehicles();
+    }
+  }
+
+  loadUserVehicles(): void {
+    this.loadingVehicles = true;
+    this.vehicleError = '';
+    
+    this.voitureService.getUserVehicles().subscribe({
+      next: (data) => {
+        this.userVehicles = data;
+        this.loadingVehicles = false;
+      },
+      error: (err) => {
+        console.error('Error loading vehicles:', err);
+        this.vehicleError = 'Failed to load your vehicles. Please try again later.';
+        this.loadingVehicles = false;
+      }
+    });
+  }
+
+  getVehicleImageUrl(vehicle: Vehicle): string {
+    if (!vehicle.image) return '';
+    return `http://localhost:9090/api/voiture/images/${vehicle.image}`;
+  }
+
+  // Vehicle modal methods
+  get v() {
+    return this.vehicleForm.controls;
+  }
+
+  openAddVehicleModal(): void {
+    this.showAddVehicleModal = true;
+    this.vehicleError = '';
+    this.vehicleForm.reset();
+    this.selectedFile = null;
+  }
+
+  closeAddVehicleModal(): void {
+    this.showAddVehicleModal = false;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file is an image
+      if (!file.type.match('image.*')) {
+        this.vehicleError = 'Please select an image file';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.vehicleError = 'File size should not exceed 5MB';
+        return;
+      }
+      
+      this.selectedFile = file;
+    }
+  }
+
+  submitVehicle(): void {
+    if (this.vehicleForm.invalid) {
+      return;
+    }
+    
+    this.addingVehicle = true;
+    this.vehicleError = '';
+    
+    const immatriculation = this.v['immatriculation'].value;
+    const marque = this.v['marque'].value;
+    const model = this.v['model'].value;
+    
+    this.voitureService.addVehicle(
+      immatriculation, 
+      marque, 
+      model, 
+      this.selectedFile || undefined
+    ).subscribe({
+      next: (response) => {
+        console.log('Vehicle added successfully:', response);
+        this.addingVehicle = false;
+        this.closeAddVehicleModal();
+        
+        // Reload vehicles list
+        this.loadUserVehicles();
+      },
+      error: (error) => {
+        console.error('Error adding vehicle:', error);
+        this.vehicleError = error.error || 'Failed to add vehicle. Please try again.';
+        this.addingVehicle = false;
+      }
+    });
+  }
+
+  editVehicle(vehicle: Vehicle): void {
+    // This will be implemented later when we create the edit modal
+    alert(`Edit vehicle ${vehicle.marque} ${vehicle.model} coming soon!`);
+  }
+
+  deleteVehicle(vehicle: Vehicle): void {
+    if (confirm(`Are you sure you want to delete ${vehicle.marque} ${vehicle.model}?`)) {
+      this.voitureService.deleteVehicle(vehicle.id).subscribe({
+        next: () => {
+          // Remove vehicle from list
+          this.userVehicles = this.userVehicles.filter(v => v.id !== vehicle.id);
+        },
+        error: (error) => {
+          console.error('Error deleting vehicle:', error);
+          alert('Failed to delete vehicle. Please try again.');
+        }
+      });
+    }
   }
 }

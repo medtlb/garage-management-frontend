@@ -1,0 +1,57 @@
+<!-- src/app/components/map-container/map-container.component.html -->
+<div class="map-container">
+    <!-- App Header -->
+    <app-header 
+      [userName]="userName"
+      (logoutEvent)="logout()">
+    </app-header>
+    
+    <div class="map-content">
+      <div class="sidebar">
+        <!-- Sidebar Tabs -->
+        <div class="sidebar-tabs">
+          <button class="tab-button" [class.active]="activeTab === 'garages'" (click)="setActiveTab('garages')">
+            <i class="tab-icon">🏢</i> Garages
+          </button>
+          <button class="tab-button" [class.active]="activeTab === 'vehicles'" (click)="setActiveTab('vehicles')">
+            <i class="tab-icon">🚗</i> My Vehicles
+          </button>
+        </div>
+  
+        <!-- Garages Tab Content -->
+        <app-garage-list 
+          *ngIf="activeTab === 'garages'"
+          (garageSelected)="onGarageSelected($event)">
+        </app-garage-list>
+  
+        <!-- Vehicles Tab Content -->
+        <app-vehicle-list 
+          *ngIf="activeTab === 'vehicles'"
+          (addVehicle)="toggleVehicleForm()"
+          (editVehicle)="toggleVehicleForm($event)">
+        </app-vehicle-list>
+      </div>
+    
+      <!-- Google Map -->
+      <div class="map-area">
+        <app-google-map 
+          [userLocation]="userLocation"
+          (garageSelected)="onGarageSelected($event)">
+        </app-google-map>
+      </div>
+    </div>
+    
+    <!-- Garage Details Modal -->
+    <app-garage-detail 
+      *ngIf="selectedGarage" 
+      [garage]="selectedGarage"
+      (close)="closeGarageDetails()">
+    </app-garage-detail>
+    
+    <!-- Vehicle Form Modal -->
+    <app-vehicle-form
+      *ngIf="showVehicleForm"
+      [vehicle]="selectedVehicle"
+      (close)="toggleVehicleForm()">
+    </app-vehicle-form>
+  </div>

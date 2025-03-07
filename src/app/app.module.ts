@@ -9,16 +9,31 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
-import { MapComponent } from './components/map/map.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
+// New components after separation
+import { MapContainerComponent } from './components/map-container/map-container.component';
+import { HeaderComponent } from './components/header/header.component';
+import { GoogleMapComponent } from './components/google-map/google-map.component';
+import { GarageListComponent } from './components/garage-list/garage-list.component';
+import { GarageDetailComponent } from './components/garage-detail/garage-detail.component';
+import { VehicleListComponent } from './components/vehicle-list/vehicle-list.component';
+import { VehicleFormComponent } from './components/vehicle-form/vehicle-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    MapComponent
+    
+    // New separated components
+    MapContainerComponent,
+    HeaderComponent,
+    GoogleMapComponent,
+    GarageListComponent,
+    GarageDetailComponent,
+    VehicleListComponent,
+    VehicleFormComponent
   ],
   imports: [
     BrowserModule,

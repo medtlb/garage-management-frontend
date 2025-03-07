@@ -1,0 +1,42 @@
+<p>vehicle-list works!</p>
+<!-- src/app/components/vehicle-list/vehicle-list.component.html -->
+<div class="tab-content">
+    <div class="vehicle-list">
+      <div *ngIf="loadingVehicles" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your vehicles...</p>
+      </div>
+  
+      <div *ngIf="vehicleError" class="error-state">
+        {{ vehicleError }}
+      </div>
+  
+      <div *ngIf="!loadingVehicles && userVehicles.length === 0" class="empty-state">
+        <p>You don't have any vehicles yet.</p>
+        <button class="add-vehicle-btn" (click)="onAddVehicle()">
+          Add Vehicle
+        </button>
+      </div>
+  
+      <div *ngFor="let vehicle of userVehicles" class="vehicle-card">
+        <div class="vehicle-image">
+          <img *ngIf="vehicle.image" [src]="getVehicleImageUrl(vehicle)" alt="{{ vehicle.marque }} {{ vehicle.model }}">
+          <div *ngIf="!vehicle.image" class="no-image">🚗</div>
+        </div>
+        <div class="vehicle-info">
+          <h3>{{ vehicle.marque }} {{ vehicle.model }}</h3>
+          <p class="vehicle-plate">{{ vehicle.immatriculation }}</p>
+        </div>
+        <div class="vehicle-actions">
+          <button class="edit-btn" (click)="onEditVehicle(vehicle)">Edit</button>
+          <button class="delete-btn" (click)="deleteVehicle(vehicle)">Delete</button>
+        </div>
+      </div>
+  
+      <div class="add-vehicle-container" *ngIf="userVehicles.length > 0">
+        <button class="add-vehicle-btn" (click)="onAddVehicle()">
+          Add Vehicle
+        </button>
+      </div>
+    </div>
+  </div>

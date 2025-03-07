@@ -1,0 +1,43 @@
+<!-- src/app/components/google-map/google-map.component.html -->
+<div class="map-wrapper">
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Loading map...</p>
+    </div>
+  
+    <div *ngIf="error" class="error-overlay">
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadGarages()">Retry</button>
+    </div>
+  
+    <div *ngIf="!apiLoaded" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Loading Google Maps...</p>
+    </div>
+  
+    <google-map 
+      *ngIf="apiLoaded"
+      [center]="center" 
+      [zoom]="zoom"
+      [options]="options"
+      height="100%"
+      width="100%"
+    >
+      <!-- Garage markers -->
+      <map-marker
+        *ngFor="let marker of garageMarkers"
+        [position]="marker.position"
+        [title]="marker.title"
+        [options]="marker.options"
+        (mapClick)="marker.onClick()"
+      ></map-marker>
+  
+      <!-- User location marker -->
+      <map-marker
+        *ngIf="userMarker"
+        [position]="userMarker.position"
+        [title]="userMarker.title"
+        [options]="userMarker.options"
+      ></map-marker>
+    </google-map>
+  </div>

@@ -1,0 +1,62 @@
+<!-- src/app/components/garage-list/garage-list.component.html -->
+<div class="tab-content">
+    <div class="category-filter">
+      <label for="categorySelect" class="filter-label">Filter by Category</label>
+      <select id="categorySelect" (change)="filterByCategory($event)">
+        <option value="">All Categories</option>
+        <option value="VEHICULES_LEGERS">Véhicules légers</option>
+        <option value="VEHICULES_UTILITAIRES">Véhicules utilitaires</option>
+        <option value="CAMIONS">Camions</option>
+        <option value="VEHICULES_ELECTRIQUES_HYBRIDES">Véhicules électriques et hybrides</option>
+        <option value="MOTOS_SCOOTERS">Motos et scooters</option>
+        <option value="ENGINS_AGRICOLES">Engins agricoles</option>
+        <option value="VEHICULES_CHANTIER">Véhicules de chantier</option>
+      </select>
+    </div>
+  
+    <div class="search-bar">
+      <input 
+        type="text" 
+        placeholder="Search garages..." 
+        class="search-input"
+        (input)="filterGarages($event)"
+      >
+      <button class="search-btn">
+        <i class="search-icon">🔍</i>
+      </button>
+    </div>
+  
+    <div class="garage-list">
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading garages...</p>
+      </div>
+  
+      <div *ngIf="error" class="error-state">
+        {{ error }}
+      </div>
+  
+      <div *ngIf="!loading && filteredGarages.length === 0" class="empty-state">
+        <p>No garages found in your area.</p>
+      </div>
+  
+      <div 
+        *ngFor="let garage of filteredGarages" 
+        class="garage-card"
+        [class.active]="selectedGarageId === garage.id"
+        (click)="selectGarage(garage)"
+      >
+        <div class="garage-info">
+          <h3>{{ garage.nom }}</h3>
+          <div class="garage-details">
+            <span class="garage-phone">
+              <i>📞</i> {{ garage.telephone || 'No phone' }}
+            </span>
+            <span class="garage-category">
+              <i>🚗</i> {{ getCategoryLabel(garage.categorie) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

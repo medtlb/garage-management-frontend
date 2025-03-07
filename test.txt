@@ -1,0 +1,151 @@
+// src/app/app.module.ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { GoogleMapsModule } from '@angular/google-maps';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+
+// New components after separation
+import { MapContainerComponent } from './components/map-container/map-container.component';
+import { HeaderComponent } from './components/header/header.component';
+import { GoogleMapComponent } from './components/google-map/google-map.component';
+import { GarageListComponent } from './components/garage-list/garage-list.component';
+import { GarageDetailComponent } from './components/garage-detail/garage-detail.component';
+import { VehicleListComponent } from './components/vehicle-list/vehicle-list.component';
+import { VehicleFormComponent } from './components/vehicle-form/vehicle-form.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    RegisterComponent,
+    
+    // New separated components
+    MapContainerComponent,
+    HeaderComponent,
+    GoogleMapComponent,
+    GarageListComponent,
+    GarageDetailComponent,
+    VehicleListComponent,
+    VehicleFormComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    GoogleMapsModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+------------------
+
+// src/app/app.module.ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { GoogleMapsModule } from '@angular/google-maps';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { MapComponent } from './components/map/map.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { MapContainerComponent } from './components/map-container/map-container.component';
+import { HeaderComponent } from './components/header/header.component';
+import { GoogleMapComponent } from './components/google-map/google-map.component';
+import { GarageListComponent } from './components/garage-list/garage-list.component';
+import { GarageDetailComponent } from './components/garage-detail/garage-detail.component';
+import { VehicleListComponent } from './components/vehicle-list/vehicle-list.component';
+import { VehicleFormComponent } from './components/vehicle-form/vehicle-form.component';
+
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    RegisterComponent,
+    MapComponent,
+    MapContainerComponent,
+    HeaderComponent,
+    GoogleMapComponent,
+    GarageListComponent,
+    GarageDetailComponent,
+    VehicleListComponent,
+    VehicleFormComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    GoogleMapsModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+----------------------------------
+// src/app/app-routing.module.ts
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { MapContainerComponent } from './components/map-container/map-container.component';
+import { ClientGuard } from './guards/client.guard';
+
+const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'map', component: MapContainerComponent, canActivate: [ClientGuard] },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+------------------------------------
+
+// src/app/app-routing.module.ts
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { MapComponent } from './components/map/map.component';
+import { ClientGuard } from './guards/client.guard';
+
+const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'map', component: MapComponent, canActivate: [ClientGuard] },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

@@ -5,6 +5,13 @@ import { Vehicle } from '../../models/vehicle';
 import { VoitureService } from '../../services/voiture.service';
 import { ReservationService, Reservation } from '../../services/reservation.service';
 
+// Interfaces for type safety
+interface AvailabilityPeriod {
+  jour: string; // Day of week
+  heureDebut: string;
+  heureFin: string;
+}
+
 interface DaySlot {
   date: Date;
   dayName: string;
@@ -34,7 +41,7 @@ export class ReservationFormComponent implements OnInit {
   error = '';
   
   // Availability data
-  availableDays: { [key: string]: any } = {}; // Keyed by day of week
+  availableDays: { [key: string]: AvailabilityPeriod[] } = {}; 
   daySlots: DaySlot[] = [];
   timeSlots: TimeSlot[] = [];
   selectedDay: Date | null = null;
@@ -80,7 +87,7 @@ export class ReservationFormComponent implements OnInit {
 
   loadGarageAvailability(): void {
     this.reservationService.getGarageAvailabilities(this.garage.id).subscribe({
-      next: (availabilities) => {
+      next: (availabilities: AvailabilityPeriod[]) => {
         console.log('Loaded availabilities:', availabilities);
         
         // Group availabilities by day of week
@@ -90,6 +97,7 @@ export class ReservationFormComponent implements OnInit {
             this.availableDays[day] = [];
           }
           this.availableDays[day].push({
+            jour: avail.jour,
             heureDebut: avail.heureDebut,
             heureFin: avail.heureFin
           });

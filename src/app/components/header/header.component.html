@@ -1,12 +1,15 @@
-<!-- src/app/components/header/header.component.html -->
 <div class="map-header">
-    <div class="header-content">
-      <h1>Garage Finder</h1>
-      <div class="user-section">
-        <span class="user-name">{{ userName }}</span>
-        <button class="logout-btn" (click)="logout()">
-          Logout
-        </button>
+  <div class="header-content">
+    <h1>Garage Finder</h1>
+    <div class="user-section">
+      <div class="nav-links">
+        <a routerLink="/map" routerLinkActive="active">Map</a>
+        <a routerLink="/reservations" routerLinkActive="active">My Reservations</a>
       </div>
+      <span class="user-name">{{ userName }}</span>
+      <button class="logout-btn" (click)="logout()">
+        Logout
+      </button>
     </div>
   </div>
+</div>

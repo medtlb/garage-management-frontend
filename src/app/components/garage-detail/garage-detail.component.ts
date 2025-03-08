@@ -1,4 +1,3 @@
-// src/app/components/garage-detail/garage-detail.component.ts
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Garage } from '../../models/garage';
 
@@ -10,14 +9,25 @@ import { Garage } from '../../models/garage';
 export class GarageDetailComponent {
   @Input() garage!: Garage;
   @Output() close = new EventEmitter<void>();
+  
+  showReservationForm = false;
 
   closeModal(): void {
     this.close.emit();
   }
 
   makeReservation(): void {
-    // TODO: Implement reservation logic
-    alert(`Reservation for ${this.garage.nom} is coming soon!`);
+    this.showReservationForm = true;
+  }
+  
+  onReservationFormClose(): void {
+    this.showReservationForm = false;
+  }
+  
+  onReservationCreated(reservation: any): void {
+    // Show simple success message
+    alert('Reservation created successfully!');
+    this.closeModal();
   }
 
   getCategoryLabel(category: string | undefined): string {

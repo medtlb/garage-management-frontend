@@ -1,0 +1,61 @@
+<div class="reservations-container">
+    <div class="reservations-header">
+      <h2>My Reservations</h2>
+      <button class="refresh-btn" (click)="loadReservations()">
+        <i class="refresh-icon">↻</i> Refresh
+      </button>
+    </div>
+  
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your reservations...</p>
+    </div>
+  
+    <div *ngIf="error" class="error-state">
+      {{ error }}
+    </div>
+  
+    <div *ngIf="!loading && reservations.length === 0" class="empty-state">
+      <p>You don't have any reservations yet.</p>
+      <a routerLink="/map" class="action-link">Find a garage to make a reservation</a>
+    </div>
+  
+    <div *ngIf="reservations.length > 0" class="reservations-list">
+      <div *ngFor="let reservation of reservations" class="reservation-card">
+        <div class="reservation-header">
+          <h3>{{ reservation.garageNom }}</h3>
+          <span [class]="'status-badge ' + getStatusClass(reservation.status)">
+            {{ reservation.status }}
+          </span>
+        </div>
+  
+        <div class="reservation-details">
+          <div class="detail-row">
+            <span class="detail-label">Vehicle:</span>
+            <span class="detail-value">{{ reservation.voitureMarque }} {{ reservation.voitureModel }} ({{ reservation.voitureImmatriculation }})</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value">{{ formatDateTime(reservation.dateReservation) }}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="detail-label">Description:</span>
+            <span class="detail-value">{{ reservation.description }}</span>
+          </div>
+          
+          <div *ngIf="reservation.prixEstime" class="detail-row">
+            <span class="detail-label">Estimated Price:</span>
+            <span class="detail-value">{{ reservation.prixEstime }} €</span>
+          </div>
+        </div>
+  
+        <div class="reservation-actions" *ngIf="reservation.status.toLowerCase() === 'en cours'">
+          <button class="cancel-btn" (click)="cancelReservation(reservation.id)">
+            Cancel Reservation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

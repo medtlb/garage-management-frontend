@@ -1,0 +1,112 @@
+<div class="reservation-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Make a Reservation</h2>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <h3 class="garage-name">{{ garage.nom }}</h3>
+        
+        <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+        
+        <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="voitureId" class="form-label">Select Your Vehicle</label>
+            <select 
+              id="voitureId" 
+              formControlName="voitureId"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': reservationForm.get('voitureId')?.touched && reservationForm.get('voitureId')?.errors }"
+            >
+              <option value="">-- Select a vehicle --</option>
+              <option *ngFor="let vehicle of userVehicles" [value]="vehicle.id">
+                {{ vehicle.marque }} {{ vehicle.model }} ({{ vehicle.immatriculation }})
+              </option>
+            </select>
+            <div *ngIf="reservationForm.get('voitureId')?.touched && reservationForm.get('voitureId')?.errors" class="invalid-feedback">
+              Please select a vehicle
+            </div>
+            <div *ngIf="userVehicles.length === 0" class="add-vehicle-link">
+              <a routerLink="/map" [queryParams]="{tab: 'vehicles'}">Add a vehicle first</a>
+            </div>
+          </div>
+          
+          <!-- Day Selection -->
+          <div class="form-group">
+            <label class="form-label">Select a Day</label>
+            <div class="day-selector">
+              <div 
+                *ngFor="let day of daySlots" 
+                class="day-item" 
+                [class.available]="day.available" 
+                [class.selected]="isDaySelected(day)" 
+                [class.unavailable]="!day.available"
+                (click)="selectDay(day)"
+              >
+                <div class="day-name">{{ day.dayName }}</div>
+                <div class="day-number">{{ day.dayNumber }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Time Selection -->
+          <div *ngIf="selectedDay" class="form-group">
+            <label class="form-label">Select a Time</label>
+            <div class="time-selector">
+              <div 
+                *ngFor="let time of timeSlots" 
+                class="time-item" 
+                [class.available]="time.available" 
+                [class.selected]="isTimeSelected(time)" 
+                [class.unavailable]="!time.available"
+                (click)="selectTime(time)"
+              >
+                {{ time.displayTime }}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="description" class="form-label">Service Description</label>
+            <textarea 
+              id="description" 
+              formControlName="description"
+              class="form-control"
+              rows="4"
+              placeholder="Describe the service you need (e.g., oil change, brake inspection, etc.)"
+              [ngClass]="{ 'is-invalid': reservationForm.get('description')?.touched && reservationForm.get('description')?.errors }"
+            ></textarea>
+            <div *ngIf="reservationForm.get('description')?.touched && reservationForm.get('description')?.errors" class="invalid-feedback">
+              <div *ngIf="reservationForm.get('description')?.errors?.['required']">Please provide a description</div>
+              <div *ngIf="reservationForm.get('description')?.errors?.['maxlength']">Description must be less than 500 characters</div>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="prixEstime" class="form-label">Estimated Price (Optional)</label>
+            <div class="price-input">
+              <input 
+                type="number" 
+                id="prixEstime" 
+                formControlName="prixEstime"
+                class="form-control"
+                min="0"
+                step="10"
+              >
+              <span class="currency">€</span>
+            </div>
+            <small class="form-text">Leave at 0 if unsure. The garage will provide the actual price.</small>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" 
+                   [disabled]="reservationForm.invalid || loading || !selectedDay || !selectedTime">
+              <span *ngIf="loading" class="spinner-sm"></span>
+              Submit Reservation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

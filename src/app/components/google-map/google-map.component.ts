@@ -1,5 +1,5 @@
 // src/app/components/google-map/google-map.component.ts
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { GarageService } from '../../services/garage.service';
 import { Garage } from '../../models/garage';
 
@@ -8,7 +8,7 @@ import { Garage } from '../../models/garage';
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.css']
 })
-export class GoogleMapComponent implements OnInit, OnChanges, AfterViewInit {
+export class GoogleMapComponent implements OnInit {
   @Input() userLocation: google.maps.LatLngLiteral | null = null;
   @Output() garageSelected = new EventEmitter<Garage>();
 
@@ -30,73 +30,107 @@ export class GoogleMapComponent implements OnInit, OnChanges, AfterViewInit {
 
   // Markers
   garageMarkers: any[] = [];
-  userMarker?: any;
+  userMarker: any = null;
 
   // Garages data
   garages: Garage[] = [];
   loading = true;
   error = '';
 
-  constructor(private garageService: GarageService) {}
+  constructor(
+    private garageService: GarageService,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
     console.log('GoogleMapComponent initialized');
-    // Load the Google Maps API script
     this.loadGoogleMapsAPI();
-    
-    // Load garages
     this.loadGarages();
-  }
-
-  ngAfterViewInit(): void {
-    console.log('GoogleMapComponent view initialized');
-    if (!this.apiLoaded) {
-      this.loadGoogleMapsAPI();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('GoogleMapComponent changes detected', changes);
-    // Update user marker when userLocation changes
-    if (changes['userLocation'] && this.userLocation) {
-      this.center = this.userLocation;
-      this.createUserMarker();
-    }
+    this.getCurrentLocation();
   }
 
   loadGoogleMapsAPI(): void {
     console.log('Loading Google Maps API');
+    
+    // Check if Google Maps API is already loaded
     if (window.google && window.google.maps) {
       console.log('Google Maps API already loaded');
-      this.apiLoaded = true;
-      this.createGarageMarkers();
-      this.createUserMarker();
+      this.ngZone.run(() => {
+        this.apiLoaded = true;
+        this.initializeMap();
+      });
       return;
     }
 
+    // Dynamic script loading
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA_LNMQF1cv68ZQZKrCZMCelJv62UaqKCo`;
     script.async = true;
     script.defer = true;
+    
     script.onload = () => {
-      console.log('Google Maps API loaded successfully');
-      this.apiLoaded = true;
-      this.createGarageMarkers();
-      if (this.userLocation) {
-        this.createUserMarker();
-      }
+      console.log('Google Maps API script loaded');
+      this.ngZone.run(() => {
+        this.apiLoaded = true;
+        this.initializeMap();
+      });
     };
+    
+    script.onerror = (error) => {
+      console.error('Error loading Google Maps API', error);
+      this.error = 'Failed to load Google Maps';
+      this.loading = false;
+    };
+
     document.head.appendChild(script);
   }
 
+  initializeMap(): void {
+    console.log('Initializing map');
+    this.createGarageMarkers();
+    this.createUserMarker();
+  }
+
+  getCurrentLocation(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Geolocation successful', position);
+          this.ngZone.run(() => {
+            this.userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Update center of the map
+            this.center = this.userLocation;
+            
+            // Create user marker
+            this.createUserMarker();
+          });
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      console.log('Geolocation is not supported by this browser.');
+    }
+  }
+
   loadGarages(): void {
-    console.log('Loading garages data');
+    console.log('Loading garages');
     this.loading = true;
     this.error = '';
 
     this.garageService.getAllGarages().subscribe({
       next: (data) => {
-        console.log('Garages loaded successfully', data);
+        console.log('Garages loaded:', data);
         this.garages = data.filter(garage => 
           garage.latitude != null && 
           garage.longitude != null && 
@@ -106,8 +140,9 @@ export class GoogleMapComponent implements OnInit, OnChanges, AfterViewInit {
         
         this.loading = false;
         
-        // Create markers for each valid garage
-        this.createGarageMarkers();
+        if (this.apiLoaded) {
+          this.createGarageMarkers();
+        }
         
         // If garages are found and no user location, center the map on the first garage
         if (this.garages.length > 0 && !this.userLocation) {
@@ -126,55 +161,62 @@ export class GoogleMapComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   createGarageMarkers(): void {
-    console.log('Creating garage markers, API loaded:', this.apiLoaded);
+    console.log('Creating garage markers');
     if (!this.apiLoaded || !window.google) {
-      console.log('Google Maps API not loaded yet, skipping marker creation');
+      console.log('Cannot create markers: API not loaded');
       return;
     }
   
-    this.garageMarkers = this.garages.map(garage => {
-      return {
-        position: {
-          lat: garage.latitude,
-          lng: garage.longitude
+    this.garageMarkers = this.garages.map(garage => ({
+      position: {
+        lat: garage.latitude,
+        lng: garage.longitude
+      },
+      title: garage.nom,
+      options: {
+        icon: {
+          url: 'assets/garage-marker.svg',
+          scaledSize: new window.google.maps.Size(40, 40),
+          anchor: new window.google.maps.Point(20, 40)
         },
-        title: garage.nom,
-        options: {
-          icon: {
-            url: 'assets/garage-marker.svg',
-            scaledSize: new google.maps.Size(40, 40),
-            anchor: new google.maps.Point(20, 40)
-          },
-          animation: google.maps.Animation.DROP
-        },
-        onClick: () => {
-          this.onMarkerClick(garage);
-        }
-      };
-    });
+        animation: window.google.maps.Animation.DROP
+      },
+      onClick: () => {
+        this.onMarkerClick(garage);
+      }
+    }));
     
     console.log('Created garage markers:', this.garageMarkers.length);
   }
 
   createUserMarker(): void {
-    console.log('Creating user marker, API loaded:', this.apiLoaded, 'User location:', this.userLocation);
+    console.log('Creating user marker');
+    console.log('User Location:', this.userLocation);
+    console.log('API Loaded:', this.apiLoaded);
+    console.log('Window Google:', !!window.google);
+
     if (!this.apiLoaded || !this.userLocation || !window.google) {
-      console.log('Cannot create user marker: API not loaded or no user location');
+      console.log('Cannot create user marker - conditions not met');
       return;
     }
 
+    // Ensure the user marker is created with correct Google Maps marker
     this.userMarker = {
-      position: this.userLocation,
+      position: {
+        lat: this.userLocation.lat,
+        lng: this.userLocation.lng
+      },
       title: 'Your Location',
       options: {
         icon: {
           url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+          scaledSize: new window.google.maps.Size(40, 40)
         },
-        animation: google.maps.Animation.BOUNCE,
+        animation: window.google.maps.Animation.BOUNCE
       }
     };
-    
-    console.log('User marker created');
+
+    console.log('User Marker Created:', this.userMarker);
   }
 
   onMarkerClick(garage: Garage): void {

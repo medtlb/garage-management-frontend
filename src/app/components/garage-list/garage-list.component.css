@@ -30,7 +30,7 @@
   }
   
   .category-filter select:focus {
-    border-color: #2575fc;
+    border-color: #7aaffd;
     box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
     outline: none;
   }
@@ -59,7 +59,7 @@
   
   .search-btn {
     padding: 10px 15px;
-    background-color: #2575fc;
+    background-color: #7aaffd;
     color: white;
     border: none;
     border-radius: 0 4px 4px 0;
@@ -110,7 +110,7 @@
   
   .garage-info h3 {
     margin: 0 0 10px;
-    color: #2575fc;
+    color: #7aaffd;
   }
   
   .garage-details {
@@ -128,7 +128,7 @@
   
   .spinner {
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #2575fc;
+    border-top: 4px solid #7aaffd;
     border-radius: 50%;
     width: 40px;
     height: 40px;

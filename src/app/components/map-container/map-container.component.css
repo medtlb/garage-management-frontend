@@ -61,7 +61,7 @@
   }
   
   .tab-button.active {
-    color: #2575fc;
+    color: #7aaffd;
     position: relative;
   }
   
@@ -72,7 +72,7 @@
     left: 25%;
     width: 50%;
     height: 3px;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
+    background: linear-gradient(to right, #100C07, #7aaffd);
   }
   
   .tab-button:hover {

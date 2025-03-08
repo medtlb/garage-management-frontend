@@ -1,5 +1,5 @@
 .map-header {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: linear-gradient(135deg, #100C07 0%, #7aaffd 100%);
   color: white;
   padding: 15px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -66,5 +66,5 @@
 
 .logout-btn:hover {
   background: white;
-  color: #2575fc;
+  color: #100C07;
 }

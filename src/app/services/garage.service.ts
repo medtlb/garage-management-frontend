@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Garage } from '../models/garage';
 
 @Injectable({
@@ -37,11 +37,32 @@ export class GarageService {
     }
     
     // Return an observable with a user-facing error message
-    return throwError(() => new Error('Unable to load garages. Please try again later.'));
+    return throwError(() => new Error('Unable to process request. Please try again later.'));
   }
 
   getGarageById(id: number): Observable<Garage> {
     return this.http.get<Garage>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
+  add(garage: Garage): Observable<number> {
+    return this.http.post<number>(this.apiUrl, garage).pipe(
+      tap(id => console.log(`Added garage with id: ${id}`)),
+      catchError(this.handleError)
+    );
+  }
+  
+  update(garage: Garage, id: number): Observable<number> {
+    return this.http.put<number>(`${this.apiUrl}/${id}`, garage).pipe(
+      tap(updatedId => console.log(`Updated garage with id: ${updatedId}`)),
+      catchError(this.handleError)
+    );
+  }
+  
+  deleteById(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => console.log(`Deleted garage with id: ${id}`)),
       catchError(this.handleError)
     );
   }

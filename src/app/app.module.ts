@@ -47,7 +47,7 @@ import { AdminGarageManagementComponent } from './components/admin/admin-garage-
    AppRoutingModule,
    HttpClientModule,
    ReactiveFormsModule,
-   GoogleMapsModule
+   GoogleMapsModule,
  ],
  providers: [
    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

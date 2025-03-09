@@ -12,6 +12,7 @@ import { VehiculeCategorie } from '../../../models/vehicule-categorie.enum';
 export class AdminGarageManagementComponent implements OnInit {
   garages: Garage[] = [];
   loading = false;
+  isSubmitting = false;
   error = '';
   
   // Form for adding/editing garage
@@ -39,7 +40,7 @@ export class AdminGarageManagementComponent implements OnInit {
       nom: ['', Validators.required],
       telephone: [''],
       email: ['', [Validators.email]],
-      categorie: [''],
+      categorie: [''], // Ensure this matches the enum values exactly
       capacite: [null],
       latitude: ['', [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]],
       longitude: ['', [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]]
@@ -76,7 +77,7 @@ export class AdminGarageManagementComponent implements OnInit {
         nom: garage.nom,
         telephone: garage.telephone || '',
         email: garage.email || '',
-        categorie: garage.categorie || '',
+        categorie: garage.categorie || '', // Ensure this matches exactly
         capacite: garage.capacite || null,
         latitude: garage.latitude,
         longitude: garage.longitude
@@ -103,6 +104,7 @@ export class AdminGarageManagementComponent implements OnInit {
     this.showGarageForm = false;
     this.selectedGarage = null;
     this.garageForm.reset();
+    this.isSubmitting = false;
   }
 
   onMapClick(event: google.maps.MapMouseEvent): void {
@@ -123,19 +125,21 @@ export class AdminGarageManagementComponent implements OnInit {
       return;
     }
     
+    this.isSubmitting = true;
+    
     const garageData: Garage = {
-      // id is optional now since we updated the interface
       nom: this.garageForm.value.nom,
       telephone: this.garageForm.value.telephone,
       email: this.garageForm.value.email,
-      categorie: this.garageForm.value.categorie,
+      categorie: this.garageForm.value.categorie || null, // Explicitly handle null
       capacite: this.garageForm.value.capacite,
       latitude: parseFloat(this.garageForm.value.latitude),
       longitude: parseFloat(this.garageForm.value.longitude)
     };
     
+    console.log('Submitting garage data:', garageData);
+    
     if (this.isEditing && this.selectedGarage && this.selectedGarage.id) {
-      // Add ID only for updating
       garageData.id = this.selectedGarage.id;
       this.updateGarage(garageData);
     } else {
@@ -145,49 +149,59 @@ export class AdminGarageManagementComponent implements OnInit {
 
   addNewGarage(garageData: Garage): void {
     this.loading = true;
-    // Change from add to post or create a wrapper method in the service
-    this.garageService.getAllGarages().subscribe(); // This is a placeholder - replace with actual method
-    
-    // A more direct method if you have HTTP access
-    // this.http.post<number>(this.apiUrl, garageData)...
-    
-    // Let's simulate for now - in real code, use the actual service method
-    setTimeout(() => {
-      console.log('Garage added with ID: 123');
-      this.loadGarages();
-      this.closeGarageForm();
-      this.loading = false;
-    }, 500);
+    this.garageService.add(garageData).subscribe({
+      next: (id) => {
+        console.log(`Added garage with ID: ${id}`);
+        this.loadGarages();
+        this.closeGarageForm();
+        this.loading = false;
+        this.isSubmitting = false;
+      },
+      error: (error) => {
+        console.error('Error adding garage:', error);
+        alert('Failed to add garage. Please try again.');
+        this.loading = false;
+        this.isSubmitting = false;
+      }
+    });
   }
 
   updateGarage(garageData: Garage): void {
     if (!this.selectedGarage?.id) return;
     
     this.loading = true;
-    // Change from update to put or create a wrapper method
-    this.garageService.getAllGarages().subscribe(); // This is a placeholder
-    
-    // Simulation - replace with actual method
-    setTimeout(() => {
-      console.log('Garage updated with ID:', this.selectedGarage?.id);
-      this.loadGarages();
-      this.closeGarageForm();
-      this.loading = false;
-    }, 500);
+    this.garageService.update(garageData, this.selectedGarage.id).subscribe({
+      next: (id) => {
+        console.log(`Updated garage with ID: ${id}`);
+        this.loadGarages();
+        this.closeGarageForm();
+        this.loading = false;
+        this.isSubmitting = false;
+      },
+      error: (error) => {
+        console.error('Error updating garage:', error);
+        alert('Failed to update garage. Please try again.');
+        this.loading = false;
+        this.isSubmitting = false;
+      }
+    });
   }
 
   deleteGarage(garage: Garage): void {
     if (garage.id && confirm(`Are you sure you want to delete the garage "${garage.nom}"?`)) {
       this.loading = true;
-      // Replace with actual delete method
-      this.garageService.getAllGarages().subscribe(); // This is a placeholder
-      
-      // Simulation
-      setTimeout(() => {
-        console.log('Garage deleted');
-        this.loadGarages();
-        this.loading = false;
-      }, 500);
+      this.garageService.deleteById(garage.id).subscribe({
+        next: () => {
+          console.log('Garage deleted');
+          this.loadGarages();
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error deleting garage:', error);
+          alert('Failed to delete garage. Please try again.');
+          this.loading = false;
+        }
+      });
     }
   }
 

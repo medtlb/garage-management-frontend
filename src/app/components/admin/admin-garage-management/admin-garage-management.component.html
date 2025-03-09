@@ -1,190 +1,190 @@
 <div class="tab-content">
-    <div class="management-header">
-      <h2>Garage Management</h2>
-      <button class="add-btn" (click)="openGarageForm()">
-        Add New Garage
-      </button>
-    </div>
-  
-    <div *ngIf="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading garages...</p>
-    </div>
-  
-    <div *ngIf="error" class="error-state">
-      {{ error }}
-    </div>
-  
-    <div *ngIf="!loading && garages.length === 0" class="empty-state">
-      <p>No garages found. Click 'Add New Garage' to create one.</p>
-    </div>
-  
-    <div class="garage-table-container" *ngIf="garages.length > 0">
-      <table class="garage-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Capacity</th>
-            <th>Location</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let garage of garages">
-            <td>{{ garage.nom }}</td>
-            <td>{{ getCategoryLabel(garage.categorie) }}</td>
-            <td>{{ garage.telephone || 'N/A' }}</td>
-            <td>{{ garage.email || 'N/A' }}</td>
-            <td>{{ garage.capacite || 'N/A' }}</td>
-            <td>
-              Lat: {{ garage.latitude | number:'1.4-4' }}, 
-              Lng: {{ garage.longitude | number:'1.4-4' }}
-            </td>
-            <td class="action-cell">
-              <button class="edit-btn" (click)="openGarageForm(garage)">Edit</button>
-              <button class="delete-btn" (click)="deleteGarage(garage)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Garage Form Modal -->
-    <div *ngIf="showGarageForm" class="garage-form-modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>{{ isEditing ? 'Edit Garage' : 'Add New Garage' }}</h2>
-          <button class="close-btn" (click)="closeGarageForm()">×</button>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="garageForm" (ngSubmit)="submitGarageForm()">
-            <div class="form-group">
-              <label for="nom" class="form-label">Garage Name*</label>
-              <input 
-                type="text" 
-                id="nom" 
-                formControlName="nom" 
-                class="form-control"
-                [ngClass]="{ 'is-invalid': garageForm.get('nom')?.touched && garageForm.get('nom')?.errors }"
-              >
-              <div *ngIf="garageForm.get('nom')?.touched && garageForm.get('nom')?.errors" class="invalid-feedback">
-                Garage name is required
-              </div>
+  <div class="management-header">
+    <h2>Garage Management</h2>
+    <button class="add-btn" (click)="openGarageForm()">
+      Add New Garage
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading garages...</p>
+  </div>
+
+  <div *ngIf="error" class="error-state">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && garages.length === 0" class="empty-state">
+    <p>No garages found. Click 'Add New Garage' to create one.</p>
+  </div>
+
+  <div class="garage-table-container" *ngIf="garages.length > 0">
+    <table class="garage-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Capacity</th>
+          <th>Location</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let garage of garages">
+          <td>{{ garage.nom }}</td>
+          <td>{{ getCategoryLabel(garage.categorie) }}</td>
+          <td>{{ garage.telephone || 'N/A' }}</td>
+          <td>{{ garage.email || 'N/A' }}</td>
+          <td>{{ garage.capacite || 'N/A' }}</td>
+          <td>
+            Lat: {{ garage.latitude | number:'1.4-4' }}, 
+            Lng: {{ garage.longitude | number:'1.4-4' }}
+          </td>
+          <td class="action-cell">
+            <button class="edit-btn" (click)="openGarageForm(garage)">Edit</button>
+            <button class="delete-btn" (click)="deleteGarage(garage)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Garage Form Modal -->
+  <div *ngIf="showGarageForm" class="garage-form-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Edit Garage' : 'Add New Garage' }}</h2>
+        <button class="close-btn" (click)="closeGarageForm()">×</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="garageForm" (ngSubmit)="submitGarageForm()">
+          <div class="form-group">
+            <label for="nom" class="form-label">Garage Name*</label>
+            <input 
+              type="text" 
+              id="nom" 
+              formControlName="nom" 
+              class="form-control"
+              [ngClass]="{ 'is-invalid': garageForm.get('nom')?.touched && garageForm.get('nom')?.errors }"
+            >
+            <div *ngIf="garageForm.get('nom')?.touched && garageForm.get('nom')?.errors" class="invalid-feedback">
+              Garage name is required
             </div>
-            
-            <div class="form-group">
-              <label for="telephone" class="form-label">Phone Number</label>
-              <input 
-                type="text" 
-                id="telephone" 
-                formControlName="telephone" 
-                class="form-control"
-              >
+          </div>
+          
+          <div class="form-group">
+            <label for="telephone" class="form-label">Phone Number</label>
+            <input 
+              type="text" 
+              id="telephone" 
+              formControlName="telephone" 
+              class="form-control"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email" 
+              class="form-control"
+              [ngClass]="{ 'is-invalid': garageForm.get('email')?.touched && garageForm.get('email')?.errors }"
+            >
+            <div *ngIf="garageForm.get('email')?.touched && garageForm.get('email')?.errors?.['email']" class="invalid-feedback">
+              Please enter a valid email
             </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="categorie" class="form-label">Category</label>
+            <select 
+              id="categorie" 
+              formControlName="categorie" 
+              class="form-control"
+            >
+              <option value="">-- Select Category --</option>
+              <option *ngFor="let category of categories" [value]="category">
+                {{ getCategoryLabel(category) }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="capacite" class="form-label">Capacity</label>
+            <input 
+              type="number" 
+              id="capacite" 
+              formControlName="capacite" 
+              class="form-control"
+              min="1"
+            >
+          </div>
+          
+          <div class="form-group location-group">
+            <label class="form-label">Location*</label>
+            <p class="map-instruction">Click on the map to set the garage location or enter coordinates manually.</p>
             
-            <div class="form-group">
-              <label for="email" class="form-label">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                formControlName="email" 
-                class="form-control"
-                [ngClass]="{ 'is-invalid': garageForm.get('email')?.touched && garageForm.get('email')?.errors }"
-              >
-              <div *ngIf="garageForm.get('email')?.touched && garageForm.get('email')?.errors?.['email']" class="invalid-feedback">
-                Please enter a valid email
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="categorie" class="form-label">Category</label>
-              <select 
-                id="categorie" 
-                formControlName="categorie" 
-                class="form-control"
-              >
-                <option value="">-- Select Category --</option>
-                <option *ngFor="let category of categories" [value]="category">
-                  {{ getCategoryLabel(category) }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="capacite" class="form-label">Capacity</label>
-              <input 
-                type="number" 
-                id="capacite" 
-                formControlName="capacite" 
-                class="form-control"
-                min="1"
-              >
-            </div>
-            
-            <div class="form-group location-group">
-              <label class="form-label">Location*</label>
-              <p class="map-instruction">Click on the map to set the garage location or enter coordinates manually.</p>
-              
-              <div class="coordinate-inputs">
-                <div class="coord-input">
-                  <label for="latitude">Latitude*</label>
-                  <input 
-                    type="text" 
-                    id="latitude" 
-                    formControlName="latitude" 
-                    class="form-control"
-                    [ngClass]="{ 'is-invalid': garageForm.get('latitude')?.touched && garageForm.get('latitude')?.errors }"
-                  >
-                  <div *ngIf="garageForm.get('latitude')?.touched && garageForm.get('latitude')?.errors" class="invalid-feedback">
-                    <div *ngIf="garageForm.get('latitude')?.errors?.['required']">Latitude is required</div>
-                    <div *ngIf="garageForm.get('latitude')?.errors?.['pattern']">Please enter a valid number</div>
-                  </div>
-                </div>
-                
-                <div class="coord-input">
-                  <label for="longitude">Longitude*</label>
-                  <input 
-                    type="text" 
-                    id="longitude" 
-                    formControlName="longitude" 
-                    class="form-control"
-                    [ngClass]="{ 'is-invalid': garageForm.get('longitude')?.touched && garageForm.get('longitude')?.errors }"
-                  >
-                  <div *ngIf="garageForm.get('longitude')?.touched && garageForm.get('longitude')?.errors" class="invalid-feedback">
-                    <div *ngIf="garageForm.get('longitude')?.errors?.['required']">Longitude is required</div>
-                    <div *ngIf="garageForm.get('longitude')?.errors?.['pattern']">Please enter a valid number</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="location-map">
-                <google-map 
-                  height="300px"
-                  width="100%"
-                  [center]="center"
-                  [zoom]="zoom"
-                  (mapClick)="onMapClick($event)"
+            <div class="coordinate-inputs">
+              <div class="coord-input">
+                <label for="latitude">Latitude*</label>
+                <input 
+                  type="text" 
+                  id="latitude" 
+                  formControlName="latitude" 
+                  class="form-control"
+                  [ngClass]="{ 'is-invalid': garageForm.get('latitude')?.touched && garageForm.get('latitude')?.errors }"
                 >
-                  <map-marker
-                    *ngIf="markerPosition"
-                    [position]="markerPosition"
-                    [title]="garageForm.value.nom || 'New Garage'"
-                  ></map-marker>
-                </google-map>
+                <div *ngIf="garageForm.get('latitude')?.touched && garageForm.get('latitude')?.errors" class="invalid-feedback">
+                  <div *ngIf="garageForm.get('latitude')?.errors?.['required']">Latitude is required</div>
+                  <div *ngIf="garageForm.get('latitude')?.errors?.['pattern']">Please enter a valid number</div>
+                </div>
+              </div>
+              
+              <div class="coord-input">
+                <label for="longitude">Longitude*</label>
+                <input 
+                  type="text" 
+                  id="longitude" 
+                  formControlName="longitude" 
+                  class="form-control"
+                  [ngClass]="{ 'is-invalid': garageForm.get('longitude')?.touched && garageForm.get('longitude')?.errors }"
+                >
+                <div *ngIf="garageForm.get('longitude')?.touched && garageForm.get('longitude')?.errors" class="invalid-feedback">
+                  <div *ngIf="garageForm.get('longitude')?.errors?.['required']">Longitude is required</div>
+                  <div *ngIf="garageForm.get('longitude')?.errors?.['pattern']">Please enter a valid number</div>
+                </div>
               </div>
             </div>
             
-            <div class="form-actions">
-              <button type="button" class="btn btn-secondary" (click)="closeGarageForm()">Cancel</button>
-              <button type="submit" class="btn btn-primary" [disabled]="garageForm.invalid">
-                {{ isEditing ? 'Update' : 'Add' }} Garage
-              </button>
+            <div class="location-map">
+              <google-map 
+                height="300px"
+                width="100%"
+                [center]="center"
+                [zoom]="zoom"
+                (mapClick)="onMapClick($event)"
+              >
+                <map-marker
+                  *ngIf="markerPosition"
+                  [position]="markerPosition"
+                  [title]="garageForm.value.nom || 'New Garage'"
+                ></map-marker>
+              </google-map>
             </div>
-          </form>
-        </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeGarageForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="garageForm.invalid || isSubmitting">
+              {{ isEditing ? 'Update' : 'Add' }} Garage
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="tab-content">
+    <div class="management-header">
+      <h2>Reservation Management</h2>
+      <button class="refresh-btn" (click)="loadReservations()">
+        <i class="refresh-icon">↻</i> Refresh
+      </button>
+    </div>
+  
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading reservations...</p>
+    </div>
+  
+    <div *ngIf="error" class="error-state">
+      {{ error }}
+    </div>
+  
+    <div *ngIf="!loading && reservations.length === 0" class="empty-state">
+      <p>No reservations found.</p>
+    </div>
+  
+    <div class="reservations-table-container" *ngIf="reservations.length > 0">
+      <table class="reservations-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Garage</th>
+            <th>Vehicle</th>
+            <th>Date/Time</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reservation of reservations">
+            <td>{{ reservation.id }}</td>
+            <td>{{ reservation.userNom }}</td>
+            <td>{{ reservation.garageNom }}</td>
+            <td>{{ reservation.voitureImmatriculation }}</td>
+            <td>{{ formatDateTime(reservation.dateReservation) }}</td>
+            <td>{{ reservation.description }}</td>
+            <td>
+              <span [class]="'status-badge ' + getStatusClass(reservation.status)">
+                {{ reservation.status }}
+              </span>
+            </td>
+            <td class="action-cell">
+              <button *ngIf="reservation.status === 'en cours'" 
+                      class="confirm-btn" 
+                      (click)="updateReservationStatus(reservation.id, 'confirmé')">
+                Confirm
+              </button>
+              <button *ngIf="reservation.status === 'confirmé'" 
+                      class="complete-btn" 
+                      (click)="updateReservationStatus(reservation.id, 'terminé')">
+                Complete
+              </button>
+              <button *ngIf="reservation.status === 'en cours' || reservation.status === 'confirmé'" 
+                      class="cancel-btn" 
+                      (click)="updateReservationStatus(reservation.id, 'annulé')">
+                Cancel
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

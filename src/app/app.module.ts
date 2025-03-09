@@ -24,6 +24,7 @@ import { ReservationListComponent } from './components/reservation-list/reservat
 // Admin Components
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { AdminGarageManagementComponent } from './components/admin/admin-garage-management/admin-garage-management.component';
+import { AdminReservationManagementComponent } from './components/admin/admin-reservation-management/admin-reservation-management.component';
 
 @NgModule({
  declarations: [
@@ -40,7 +41,8 @@ import { AdminGarageManagementComponent } from './components/admin/admin-garage-
    ReservationFormComponent,
    ReservationListComponent,
    AdminDashboardComponent,
-   AdminGarageManagementComponent
+   AdminGarageManagementComponent,
+   AdminReservationManagementComponent
  ],
  imports: [
    BrowserModule,

@@ -1,4 +1,3 @@
-// src/app/services/reservation.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -23,6 +22,12 @@ export class ReservationService {
 
   constructor(private http: HttpClient) { }
 
+  // Get all reservations - for admin
+  getAll(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
+  // Get current user's reservations
   getUserReservations(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/user`);
   }
@@ -44,6 +49,10 @@ export class ReservationService {
 
   updateReservation(id: number, reservation: Reservation): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, reservation);
+  }
+  
+  updateReservationStatus(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/status`, { status });
   }
 
   deleteReservation(id: number): Observable<any> {

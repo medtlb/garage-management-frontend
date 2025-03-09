@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class AdminDashboardComponent implements OnInit {
   userName: string = '';
-  activeTab: 'garages' | 'users' = 'garages';
+  activeTab: 'garages' | 'reservations' = 'garages';
 
   constructor(
     private authService: AuthService,
@@ -28,7 +28,7 @@ export class AdminDashboardComponent implements OnInit {
     this.userName = user.nom || 'Admin';
   }
 
-  setActiveTab(tab: 'garages' | 'users'): void {
+  setActiveTab(tab: 'garages' | 'reservations'): void {
     this.activeTab = tab;
   }
 

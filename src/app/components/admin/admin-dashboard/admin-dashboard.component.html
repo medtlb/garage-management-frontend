@@ -1,0 +1,40 @@
+<div class="admin-container">
+    <!-- Admin Header -->
+    <div class="admin-header">
+      <div class="header-content">
+        <h1>Admin Dashboard</h1>
+        <div class="user-section">
+          <span class="user-name">{{ userName }}</span>
+          <button class="logout-btn" (click)="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="admin-content">
+      <div class="sidebar">
+        <!-- Sidebar Tabs -->
+        <div class="sidebar-tabs">
+          <button class="tab-button" [class.active]="activeTab === 'garages'" (click)="setActiveTab('garages')">
+            <i class="tab-icon">🏢</i> Manage Garages
+          </button>
+          <button class="tab-button" [class.active]="activeTab === 'users'" (click)="setActiveTab('users')">
+            <i class="tab-icon">👤</i> Manage Users
+          </button>
+        </div>
+    
+        <!-- Garages Tab Content -->
+        <app-admin-garage-management 
+          *ngIf="activeTab === 'garages'">
+        </app-admin-garage-management>
+    
+        <!-- Users Tab Content -->
+        <div *ngIf="activeTab === 'users'" class="tab-content">
+          <div class="empty-state">
+            <p>User management coming soon...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

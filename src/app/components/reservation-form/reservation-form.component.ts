@@ -86,6 +86,11 @@ export class ReservationFormComponent implements OnInit {
   }
 
   loadGarageAvailability(): void {
+    if (!this.garage || !this.garage.id) {
+      this.error = 'Invalid garage data';
+      return;
+    }
+    
     this.reservationService.getGarageAvailabilities(this.garage.id).subscribe({
       next: (availabilities: AvailabilityPeriod[]) => {
         console.log('Loaded availabilities:', availabilities);
@@ -230,6 +235,13 @@ export class ReservationFormComponent implements OnInit {
     reservationDate.setHours(hours, minutes, 0, 0);
     
     const formValues = this.reservationForm.value;
+    
+    // Check if garage.id exists
+    if (!this.garage || this.garage.id === undefined || this.garage.id === null) {
+      this.error = 'Invalid garage selection';
+      this.loading = false;
+      return;
+    }
     
     const reservation: Reservation = {
       garageId: this.garage.id,

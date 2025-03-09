@@ -59,7 +59,7 @@ export class LoginComponent {
     if (user?.role === 'CLIENT') {
       this.router.navigate(['/map']);
     } else if (user?.role === 'ADMIN') {
-      alert('Welcome Admin! Admin dashboard is not implemented yet.');
+      this.router.navigate(['/admin']);
     } else {
       // Log details for debugging
       console.log('User role not recognized:', user?.role);

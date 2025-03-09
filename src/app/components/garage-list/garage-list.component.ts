@@ -49,7 +49,8 @@ export class GarageListComponent implements OnInit {
   }
 
   selectGarage(garage: Garage): void {
-    this.selectedGarageId = garage.id;
+    // Fix - explicitly handle the case where id might be undefined
+    this.selectedGarageId = garage.id ?? null;
     this.garageSelected.emit(garage);
   }
 

@@ -25,8 +25,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css",
-              "src/color-overrides.css"
+              "src/styles.css"
             ],
             "scripts": []
           },

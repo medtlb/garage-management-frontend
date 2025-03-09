@@ -1,5 +1,5 @@
 export interface Garage {
-    id: number;
+    id?: number;
     nom: string;
     latitude: number;
     longitude: number;

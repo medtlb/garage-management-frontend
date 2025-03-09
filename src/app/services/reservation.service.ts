@@ -1,3 +1,4 @@
+// src/app/services/reservation.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -49,6 +50,7 @@ export class ReservationService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  // Add this method to your service
   getGarageAvailabilities(garageId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.disponibiliteUrl}/garage/${garageId}`);
   }

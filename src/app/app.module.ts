@@ -21,6 +21,10 @@ import { VehicleFormComponent } from './components/vehicle-form/vehicle-form.com
 import { ReservationFormComponent } from './components/reservation-form/reservation-form.component';
 import { ReservationListComponent } from './components/reservation-list/reservation-list.component';
 
+// Admin Components
+import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { AdminGarageManagementComponent } from './components/admin/admin-garage-management/admin-garage-management.component';
+
 @NgModule({
  declarations: [
    AppComponent,
@@ -34,7 +38,9 @@ import { ReservationListComponent } from './components/reservation-list/reservat
    VehicleListComponent,
    VehicleFormComponent,
    ReservationFormComponent,
-   ReservationListComponent
+   ReservationListComponent,
+   AdminDashboardComponent,
+   AdminGarageManagementComponent
  ],
  imports: [
    BrowserModule,
